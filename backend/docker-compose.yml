@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=flash
+      - POSTGRES_USER=flash
+      - POSTGRES_DB=flash
+      - POSTGRES_PORT=5432
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "flash" ]
+      timeout: 10s
+      retries: 10
+  #    volumes:
+  #      - ./db_data:/var/lib/postgresql/data
+
+  main:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    environment:
+      - DB_HOST=db # name of the database container
+      - DB_USER=flash
+      - DB_PASSWORD=flash
+      - DB_NAME=flash
+      - DB_PORT=5432
+      - ROOT_PATH=
+    #      - APP_PORT=8000
+    ports:
+      - "8000:8000" # same as APP_POR
+    volumes:
+      - .:/app
+    # wait for the database to be ready
+    depends_on:
+      db:
+        condition: service_healthy

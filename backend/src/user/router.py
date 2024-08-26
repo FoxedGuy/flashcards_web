@@ -1,8 +1,7 @@
 from ..database.core import get_db
 from fastapi import APIRouter, Depends
 from .schemas import User, UserCreate
-from .connector import get_all_users, get_user_by_id, create_user, update_user
-
+from .connector import *
 router = APIRouter(prefix="/users", tags=["users"])
 
 
@@ -23,7 +22,7 @@ async def get_user(user_id: int, db=Depends(get_db)):
 @router.post("/", response_model=User)
 async def create_user(user: UserCreate, db=Depends(get_db)):
     try:
-        user = create_user(db, user.username, user.password, user.email)
+        user = create_new_user(db, user.username, user.password, user.email)
         return user
     except Exception as e:
         return {"error": str(e)}
@@ -32,7 +31,7 @@ async def create_user(user: UserCreate, db=Depends(get_db)):
 @router.put("/{user_id}")
 async def update_user(user_id: int, user: UserCreate, db=Depends(get_db)):
     try:
-        user = update_user(db, user_id, user.username, user.password, user.email)
+        user = update_existing_user(db, user_id, user.username, user.password, user.email)
         return user
     except Exception as e:
         return {"error": str(e)}

@@ -16,4 +16,3 @@ if __name__ == "__main__":
         logging.info("Nothing to do")
 
     logging.info("Creating admin user")
-    uvicorn.run(app, host="localhost", port=8000)

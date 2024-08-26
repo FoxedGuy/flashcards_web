@@ -1,4 +1,4 @@
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     db_password: str = "flash"
     db_name: str = "flashcards"
 
-    root_path: str = "/"
+    root_path: str = ""
 
     @property
     def db_url(self) -> str:

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy import create_engine
-from config import Settings
+from ..config import Settings
 
 sett = Settings()
 
@@ -11,8 +11,16 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 def _check_if_table_exists(table_name: str):
-    return engine.has_table(table_name)
+    return engine.dialect.has_table(engine.connect(), table_name)
 
 
 def check_all_tables():

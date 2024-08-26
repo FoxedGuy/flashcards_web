@@ -16,7 +16,7 @@ def get_user_by_id(db: Session, user_id: int):
     return user
 
 
-def create_user(db: Session, username: str, password: str, email: str):
+def create_new_user(db: Session, username: str, password: str, email: str):
     check_user = db.query(DBUser).filter(DBUser.username == username).first()
     if check_user:
         raise HTTPException(status_code=400, detail="Username already exists")
@@ -32,7 +32,7 @@ def create_user(db: Session, username: str, password: str, email: str):
     return new_user
 
 
-def update_user(db: Session, user_id: int, username: str | None, password: str | None, email: str | None):
+def update_existing_user(db: Session, user_id: int, username: str | None, password: str | None, email: str | None):
     user = db.query(DBUser).filter(DBUser.user_id == user_id).first()
 
     if user is None:

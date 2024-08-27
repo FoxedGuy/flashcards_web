@@ -2,9 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import database as models
-
 from .config import Settings
+
+
 from .user.router import router as user_router
+from .flashcard.router import router as flashcard_router
 
 import logging as l
 
@@ -38,6 +40,7 @@ app.add_middleware(
 
 
 app.include_router(user_router)
+app.include_router(flashcard_router)
 
 
 @app.get("/health")

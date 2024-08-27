@@ -8,6 +8,7 @@ class FlashcardBase(BaseModel):
 
 class FlashcardCreate(FlashcardBase):
     user_id: int
+    group_id: int
 
 
 class Flashcard(FlashcardBase):

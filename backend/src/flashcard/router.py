@@ -24,7 +24,7 @@ async def get_flashcard(flashcard_id: int, db=Depends(get_db)):
 @router.post("/", response_model=Flashcard)
 async def create_flashcard(flashcard: FlashcardCreate, db=Depends(get_db)):
     try:
-        flashcard = create_new_flashcard(db, flashcard.question, flashcard.answer, flashcard.user_id)
+        flashcard = create_new_flashcard(db, flashcard.question, flashcard.answer, flashcard.user_id, flashcard.group_id)
         return flashcard
     except Exception as e:
         return {"error": str(e)}

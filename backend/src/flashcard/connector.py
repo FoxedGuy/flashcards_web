@@ -17,13 +17,13 @@ def get_flashcard_by_id(db: Session, flashcard_id: int):
     return flashcard
 
 
-def create_new_flashcard(db: Session, question: str, answer: str, user_id: int):
+def create_new_flashcard(db: Session, question: str, answer: str, user_id: int, group_id: int):
     user = db.query(DBUser).filter(DBUser.user_id == user_id).first()
 
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    new_flashcard = DBFlashcard(question=question, answer=answer, user_id=user_id)
+    new_flashcard = DBFlashcard(question=question, answer=answer, user_id=user_id, group_id=group_id)
     db.add(new_flashcard)
     db.commit()
 

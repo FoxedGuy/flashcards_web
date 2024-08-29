@@ -11,7 +11,6 @@ class GroupCreate(GroupBase):
 
 class Group(GroupBase):
     group_id: int
-    user_id: int
 
     class Config:
         orm_mode = True

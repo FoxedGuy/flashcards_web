@@ -36,3 +36,12 @@ def update_existing_group(db: Session, group_id: int, group_name: str | None):
     db.commit()
 
     return group
+
+
+def get_all_flashcards_in_group(db: Session, group_id: int):
+    group = db.query(DBGroup).filter(DBGroup.group_id == group_id).first()
+
+    if group is None:
+        raise HTTPException(status_code=404, detail="Group not found")
+
+    return group.flashcards

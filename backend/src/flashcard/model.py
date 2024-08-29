@@ -1,3 +1,5 @@
+from sqlalchemy.orm import relationship
+
 from ..database.core import Base
 from sqlalchemy import Column, Integer, String, ForeignKey
 
@@ -9,4 +11,3 @@ class DBFlashcard(Base):
     answer = Column(String)
     user_id = Column(Integer, ForeignKey("User.user_id"))
     group_id = Column(Integer, ForeignKey("Group.group_id"))
-

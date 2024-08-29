@@ -11,3 +11,4 @@ class DBGroup(Base):
     user_id = Column(Integer, ForeignKey("User.user_id"))
     user = relationship("DBUser", back_populates="groups")
     flashcards = relationship("DBFlashcard")
+

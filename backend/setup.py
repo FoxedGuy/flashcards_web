@@ -1,5 +1,3 @@
-import uvicorn
-from src import app
 import logging
 from src.database.core import create_db, check_all_tables
 

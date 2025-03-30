@@ -35,3 +35,12 @@ async def update_user(user_id: int, user: UserCreate, db=Depends(get_db)):
         return user
     except Exception as e:
         return {"error": str(e)}
+
+
+@router.delete("/{user_id}")
+async def delete_user(user_id: int, db=Depends(get_db)):
+    try:
+        delete_user_by_id(db, user_id)
+        return {'message': 'User deleted successfully'}
+    except Exception as e:
+        return {"error": str(e)}

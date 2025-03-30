@@ -1,6 +1,9 @@
 from .model import DBUser
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def get_all_users(db: Session):
@@ -33,7 +36,8 @@ def create_new_user(db: Session, username: str, password: str, email: str):
     if check_email:
         raise HTTPException(status_code=400, detail="Email already exists")
 
-    new_user = DBUser(username=username, password=password, email=email)
+    hashed_password = pwd_context.hash(password)
+    new_user = DBUser(username=username, password=hashed_password, email=email)
     db.add(new_user)
     db.commit()
 
@@ -59,8 +63,17 @@ def update_existing_user(db: Session, user_id: int, username: str | None, passwo
         user.email = email
 
     if password:
-        user.password = password
+        user.password = pwd_context.hash(password)
 
     db.commit()
 
     return user
+
+def delete_user_by_id(db: Session, user_id: int):
+    user = db.query(DBUser).filter(DBUser.user_id == user_id).first()
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    db.delete(user)
+    db.commit()

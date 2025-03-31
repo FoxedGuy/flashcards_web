@@ -1,7 +1,18 @@
 import logging
-from backend.src.user.model import DBUser
+from src.user.model import DBUser, DBPrivilege
 from src.database.core import create_db, check_all_tables, get_db_session
 from src.user.connector import create_new_user
+
+def create_privileges():
+    with get_db_session() as db:
+        privileges = db.query(DBPrivilege).all()
+        if len(privileges) == 0:
+            db.add(DBPrivilege(name="admin"))
+            db.add(DBPrivilege(name="user"))
+            db.commit()
+            logging.info("Privileges created")
+        else:
+            logging.info("Privileges already exists")
 
 def create_admin_user():
     with get_db_session() as db:
@@ -10,7 +21,8 @@ def create_admin_user():
             create_new_user(db,
                             "admin",
                             "admin_password",
-                            "admin@admin")
+                            "admin@admin",
+                            db.query(DBPrivilege).filter(DBPrivilege.name == "admin").first().privilege_id)
             logging.info("Admin user created")
         else:
             logging.info("Admin user already exists")
@@ -27,4 +39,5 @@ if __name__ == "__main__":
         logging.info("All tables exists")
         logging.info("Nothing to do")
     logging.info("Creating admin user")
+    create_privileges()
     create_admin_user()

@@ -1,9 +1,15 @@
+from fastapi.exceptions import HTTPException
 from passlib.context import CryptContext
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
+from ..database.core import get_db
 from ..user.connector import get_user_by_username
 from datetime import datetime, timedelta
 
 from ..user.model import DBUser
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 SECRET_KEY = "your_super_secret_key"
 ALGORITHM = "HS256"
@@ -28,3 +34,27 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+async def get_current_user(token: str = Depends(oauth2_scheme), db=Depends(get_db)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+        user = get_user_by_username(db,username)
+        if username is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        return user
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+async def get_current_admin(token: str = Depends(oauth2_scheme), db=Depends(get_db)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+        user = get_user_by_username(db,username)
+        if username is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        if user.privilege.name != "admin":
+            raise HTTPException(status_code=401, detail="User is not admin")
+        return user
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")

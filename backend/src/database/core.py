@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy import create_engine
 from ..config import Settings
@@ -13,6 +14,14 @@ Base = declarative_base()
 
 def get_db():
     db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+@contextmanager
+def get_db_session():
+    db = next(get_db())
     try:
         yield db
     finally:

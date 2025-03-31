@@ -1,3 +1,4 @@
+from ..auth.security import get_current_user, get_current_admin
 from ..database.core import get_db
 from fastapi import APIRouter, Depends
 from .schemas import User, UserCreate
@@ -6,9 +7,12 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("/", response_model=list[User])
-async def get_users(db=Depends(get_db)):
+async def get_users(db=Depends(get_db), current_user_admin = Depends(get_current_admin)):
     return get_all_users(db)
 
+@router.get("/me")
+async def read_users_me(db=Depends(get_db), current_user = Depends(get_current_user)):
+    return current_user
 
 @router.get("/{user_id}", response_model=User)
 async def get_user(user_id: int, db=Depends(get_db)):
@@ -18,7 +22,6 @@ async def get_user(user_id: int, db=Depends(get_db)):
     except Exception as e:
         return {"error": str(e)}
 
-
 @router.post("/", response_model=User)
 async def create_user(user: UserCreate, db=Depends(get_db)):
     try:
@@ -27,7 +30,6 @@ async def create_user(user: UserCreate, db=Depends(get_db)):
     except Exception as e:
         return {"error": str(e)}
 
-
 @router.put("/{user_id}")
 async def update_user(user_id: int, user: UserCreate, db=Depends(get_db)):
     try:
@@ -35,7 +37,6 @@ async def update_user(user_id: int, user: UserCreate, db=Depends(get_db)):
         return user
     except Exception as e:
         return {"error": str(e)}
-
 
 @router.delete("/{user_id}")
 async def delete_user(user_id: int, db=Depends(get_db)):

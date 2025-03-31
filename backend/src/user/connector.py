@@ -1,4 +1,4 @@
-from .model import DBUser
+from .model import DBUser, DBPrivilege
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from passlib.context import CryptContext
@@ -27,7 +27,7 @@ def get_user_by_username(db: Session, username: str):
     return user
 
 
-def create_new_user(db: Session, username: str, password: str, email: str):
+def create_new_user(db: Session, username: str, password: str, email: str, privilege_id: int | None = None):
     check_user = db.query(DBUser).filter(DBUser.username == username).first()
     if check_user:
         raise HTTPException(status_code=400, detail="Username already exists")
@@ -37,14 +37,17 @@ def create_new_user(db: Session, username: str, password: str, email: str):
         raise HTTPException(status_code=400, detail="Email already exists")
 
     hashed_password = pwd_context.hash(password)
-    new_user = DBUser(username=username, password=hashed_password, email=email)
+    if privilege_id is None:
+        privilege_id = db.query(DBPrivilege).filter(DBPrivilege.name == "user").first().privilege_id
+
+    new_user = DBUser(username=username, password=hashed_password, email=email, privilege_id=privilege_id)
     db.add(new_user)
     db.commit()
 
     return new_user
 
 
-def update_existing_user(db: Session, user_id: int, username: str | None, password: str | None, email: str | None):
+def update_existing_user(db: Session, user_id: int, username: str | None, password: str | None, email: str | None, privilege_id: int | None):
     user = db.query(DBUser).filter(DBUser.user_id == user_id).first()
 
     if user is None:
@@ -64,6 +67,9 @@ def update_existing_user(db: Session, user_id: int, username: str | None, passwo
 
     if password:
         user.password = pwd_context.hash(password)
+
+    if privilege_id:
+        user.privilege_id = privilege_id
 
     db.commit()
 

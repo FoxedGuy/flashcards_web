@@ -1,11 +1,16 @@
 import logging
-from src.database.core import create_db, check_all_tables, get_db
-from src.user.connector import get_user_by_username, create_new_user
+from backend.src.user.model import DBUser
+from src.database.core import create_db, check_all_tables, get_db_session
+from src.user.connector import create_new_user
 
 def create_admin_user():
-    with get_db() as db:
-        if not get_user_by_username(db, "admin"):
-            create_new_user(db, "admin", "admin_password","admin@admin")
+    with get_db_session() as db:
+        user = db.query(DBUser).filter(DBUser.username == 'admin').first()
+        if user is None:
+            create_new_user(db,
+                            "admin",
+                            "admin_password",
+                            "admin@admin")
             logging.info("Admin user created")
         else:
             logging.info("Admin user already exists")

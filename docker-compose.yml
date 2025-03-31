@@ -18,7 +18,7 @@ services:
 
   main:
     build:
-      context: .
+      context: backend
       dockerfile: Dockerfile
       target: dev
     environment:

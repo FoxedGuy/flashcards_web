@@ -29,7 +29,7 @@ app = FastAPI(root_path=sett.root_path,
 # app.mount("/ws", socket_app)
 
 origins = [
-    "http://localhost:3000",
+    "http://localhost:5173",
 ]
 
 app.add_middleware(

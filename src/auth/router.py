@@ -31,3 +31,8 @@ async def register_new_user(form_data: RegisterForm, db=Depends(get_db)):
     except EmailAlreadyExistsException:
         raise EmailAlreadyExistsException()
     return user
+
+@router.post("/logout")
+async def logout(response: Response):
+    response.delete_cookie("access_token")
+    return {"message": "Logged out"}

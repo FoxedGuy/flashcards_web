@@ -19,24 +19,30 @@ async def get_user(user_id: int, db=Depends(get_db)):
     try:
         user = get_user_by_id(db, user_id)
         return user
-    except Exception as e:
-        return {"error": str(e)}
+    except UserNotFoundException:
+        raise UserNotFoundException()
 
 @router.post("/", response_model=User)
 async def create_user(user: UserCreate, db=Depends(get_db)):
     try:
         user = create_new_user(db, user.username, user.password, user.email)
         return user
-    except Exception as e:
-        return {"error": str(e)}
+    except UserAlreadyExistsException:
+        raise UserAlreadyExistsException()
+    except EmailAlreadyExistsException:
+        raise EmailAlreadyExistsException()
 
 @router.put("/{user_id}")
 async def update_user(user_id: int, user: UserCreate, db=Depends(get_db)):
     try:
         user = update_existing_user(db, user_id, user.username, user.password, user.email)
         return user
-    except Exception as e:
-        return {"error": str(e)}
+    except UserNotFoundException:
+        raise UserNotFoundException()
+    except UserAlreadyExistsException:
+        raise UserAlreadyExistsException()
+    except EmailAlreadyExistsException:
+        raise EmailAlreadyExistsException()
 
 @router.delete("/{user_id}")
 async def delete_user(user_id: int, db=Depends(get_db)):

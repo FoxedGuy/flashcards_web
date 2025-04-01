@@ -20,13 +20,7 @@ app = FastAPI(root_path=sett.root_path,
               title="Flashcards",
               description="Flashcards is a simple application for learning",
               version="0.0.1-dev",
-              swagger_ui_parameters={"docExpansion": "none"},
-              # docs_url=f"{sett.root_path}/docs",
-              # redoc_url=f"{sett.root_path}/redoc",
-              # openapi_prefix=sett.root_path,
-              # openapi_url=f"/openapi.json",
-              )
-# app.mount("/ws", socket_app)
+              swagger_ui_parameters={"docExpansion": "none"})
 
 origins = [
     "http://localhost:5173",

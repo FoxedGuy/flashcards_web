@@ -5,6 +5,14 @@ from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+def check_if_user_exists(db: Session, username: str):
+    user = db.query(DBUser).filter(DBUser.username == username).first()
+
+    if user is None:
+        return False
+
+    return True
+
 
 def get_all_users(db: Session):
     return db.query(DBUser).all()

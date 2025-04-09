@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends
 from .connector import *
 from .schemas import Group, GroupCreate
+from ..auth.security import get_current_user
 
 from ..database.core import get_db
 from ..flashcard.schemas import Flashcard
+from ..user.model import DBUser
 
 router = APIRouter(prefix="/groups", tags=["groups"])
 
@@ -11,16 +13,6 @@ router = APIRouter(prefix="/groups", tags=["groups"])
 @router.get("/", response_model=list[Group])
 def get_groups(db=Depends(get_db)):
     return get_all_groups(db)
-
-
-@router.get("/{group_id}", response_model=Group)
-def get_group(group_id: int, db=Depends(get_db)):
-    try:
-        group = get_group_by_id(db, group_id)
-        return group
-    except Exception as e:
-        return {"error": str(e)}
-
 
 @router.post("/", response_model=Group)
 def create_group(group: GroupCreate, db=Depends(get_db)):
@@ -30,6 +22,17 @@ def create_group(group: GroupCreate, db=Depends(get_db)):
     except Exception as e:
         return {"error": str(e)}
 
+@router.get("/user", response_model=list[Group])
+def get_groups_by_user(db=Depends(get_db),current_user: DBUser = Depends(get_current_user)):
+    return current_user.groups
+
+@router.get("/{group_id}", response_model=Group)
+def get_group(group_id: int, db=Depends(get_db)):
+    try:
+        group = get_group_by_id(db, group_id)
+        return group
+    except Exception as e:
+        return {"error": str(e)}
 
 @router.put("/{group_id}")
 def update_group(group_id: int, group: GroupCreate, db=Depends(get_db)):
